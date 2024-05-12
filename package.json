@@ -1,0 +1,19 @@
+{
+  "name": "blogging_api",
+  "version": "1.0.0",
+  "description": "it is a blogging api",
+  "main": "app.mjs",
+  "scripts": {
+    "start": "nodemon --watch app.mjs",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Fakile Temitope",
+  "license": "MIT",
+  "dependencies": {
+    "bcrypt": "^5.1.1",
+    "body-parser": "^1.20.2",
+    "express": "^4.19.2",
+    "mongodb": "^6.6.1",
+    "nodemon": "^3.1.0"
+  }
+}
