@@ -2,7 +2,7 @@ import { connect } from './conn.mjs'
 import { client } from './conn.mjs'
 
 export const createUser = async (userDetails) =>{
-    let con = connect()
+    let con = await connect()
     let result =""
     if(con){
         result = await client.db("blog").collection("users").insertOne(userDetails)
@@ -17,7 +17,7 @@ export const createUser = async (userDetails) =>{
 }
 
 export const getUsers = async () =>{
-    let con = connect()
+    let con = await connect()
     let result = ""
     if(con){
         result = await client.db("blog").collection("users").find().toArray()
@@ -30,11 +30,11 @@ export const getUsers = async () =>{
 }
 
 export const getUser = async (email) =>{
-    let con = connect()
+    let con = await connect()
     let result = ""
+    let query = {email: email}
     if(con){
-        result = await client.db("blog").collection("users").findOne()
-
+        result = await client.db("blog").collection("users").findOne(query)
     }
     else{
         result = "error in connection"
@@ -44,7 +44,7 @@ export const getUser = async (email) =>{
 }
 
 export const updateUser = async (email, password, set) =>{
-    let con = connect()
+    let con = await connect()
     let result = ""
     let query = {email: email, password: password}
     let option = {}
@@ -60,7 +60,7 @@ export const updateUser = async (email, password, set) =>{
 }
 
 export const deleteUser = async (email, password) =>{
-    let con = connect()
+    let con = await connect()
     let result = ""
     let query = {email: email, password: password}
     

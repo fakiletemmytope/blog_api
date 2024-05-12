@@ -1,3 +1,5 @@
+import dotenv from 'dotenv';
+dotenv.config();
 import { MongoClient } from "mongodb"
 const URI = process.env.DATABASE_CONNECT
 
@@ -11,6 +13,7 @@ export const connect = async () => {
         return true
     } catch (error) {
        // console.log(error)
+       await client.close()
         return false
     }
     
