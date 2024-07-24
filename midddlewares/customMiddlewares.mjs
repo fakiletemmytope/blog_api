@@ -1,6 +1,7 @@
 import { getUser } from "../functions/crudmethod.mjs";
 import bcrypt from "bcrypt";
 import { verifyAccessToken } from "./jwt.mjs";
+import UserModel from "../schemas/user.mjs";
 
 export const postUserValidation = (req, res, next) => {
     const { first_name, last_name, password, email } = req.body;
@@ -43,27 +44,34 @@ export const blogPostValidation = (req, res, next) =>{
 
 export const userLogin = async (req, res, next) =>{
     
-    const {email, password} = req.body
-    const query = {
-        email: email
-    }
-    let result = await getUser(query)
+    const {email, password} = req.body   
+
     if(!email || !password){
         return res.status(400).json({ message: 'password and email are required' })
     }
-    else if(!result){
-        return res.status(400).json({ message: 'User does not exist' })
-    }
-    else{
-        //console.log(`print: ${bcrypt.compareSync(password, result.password)}`)
-        if(bcrypt.compareSync(password, result.password)){
-            req.userId = result._id  
-            req.username = `${result.first_name} ${result.last_name}`
-            req.email = result.email
-            next()
-        }else{
-            return res.status(400).json({ message: "User's email or/and password wrong" })
-        }
+    
+    try {
+            
+            const user = await UserModel.findOne({'email': req.body.email})
+            
+            if(user){
+                    
+                    if(bcrypt.compareSync(password, user.password)){
+                        req.userId = user._id  
+                        req.username = `${user.first_name} ${user.last_name}`
+                        req.email = user.email
+                        next()
+                    }else{
+                        return res.status(400).json({ message: "User's email or/and password wrong" })
+                    }
+                
+            }
+            else{
+                return res.status(400).json({ message: 'User does not exist' })
+            }
+    } 
+    catch (error) {
+        res.status(500).send({ error });
     }
     
 }
@@ -85,20 +93,16 @@ export const userAuth = (req, res, next) => {
 
 export const verifyUserToken =  async (req, res, next) =>{
     let token = ""
-    //console.log(`this${req.headers.authorization}`)
+    
     if(req.headers.authorization){
         token = req.headers.authorization.split(" ")[1]
     }
-    //console.log(token)
-
+    
     if (!token) {
-        //console.log("test")
         res.status(401).json({message: "No authorization token found"});
     }else{
-        const result = await verifyAccessToken(token);
-        //console.log(result)      
+        const result = await verifyAccessToken(token);    
         if (!result.success) {
-            //console.log("test1")
             res.status(403).json({ error: result.error });
         }else{
             req.user = result.data;
